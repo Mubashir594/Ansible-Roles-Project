@@ -1,0 +1,30 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for portfolio
+
+# Install Nginx
+- name: Update apt package cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Install Nginx web server
+  ansible.builtin.apt:
+    name: "{{ web_server_package }}"
+    state: present
+
+# Deploy portfolio website
+- name: Copy portfolio website files
+  ansible.builtin.copy:
+    src: "{{ website_source }}"
+    dest: "{{ web_root }}/"
+    owner: "{{ website_owner }}"
+    group: "{{ website_group }}"
+    directory_mode: '0755'
+  notify: Reload Nginx
+
+# Start and enable Nginx
+- name: Start and enable Nginx service
+  ansible.builtin.service:
+    name: "{{ web_server_service }}"
+    state: started
+    enabled: yes
